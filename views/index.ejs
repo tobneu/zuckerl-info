@@ -53,7 +53,7 @@
       }
     </script>
   </head>
-  <body class="text-gray-900 bg-gray-100"></body>
+  <body class="text-gray-900 bg-gray-100">
     <div class="container px-4 py-8 mx-auto">
       <h1 class="mb-8 text-4xl font-bold text-center">
         Letzte Beiträge der Zuckerlkoalition
@@ -61,8 +61,8 @@
       <div class="mb-8 text-center">
         <button
           onclick="toggleFilters()"
-          class="inline-block px-3 py-1 mt-2 mr-2 text-sm font-semibold text-gray-700 transition duration-300 ease-in-out transform bg-gray-200 rounded-full hover:bg-gray-300 hover:scale-105 active:scale-95">
-          Filter den Spaß
+          class="px-4 py-2 mb-2 text-gray-700 transition duration-300 ease-in-out transform bg-gray-200 rounded md:mb-0 md:mr-2 hover:bg-gray-300 hover:scale-105 active:scale-95">
+          Filter ein-/ausklappen
         </button>
         <div id="filter-container">
           <button
@@ -70,9 +70,9 @@
             class="inline-block px-3 py-1 mt-2 mr-2 text-sm font-semibold text-gray-700 bg-gray-200 rounded-full">
             Alle
           </button>
-          <% const allTags = new Set(); posts.forEach(post => {
-          Object.keys(post.tags).forEach(tag => allTags.add(tag)); });
-          allTags.forEach(tag => { %>
+          <% const allTags = new Set(); posts.forEach(post => { if (post.tags &&
+          typeof post.tags === 'object') { Object.keys(post.tags).forEach(tag =>
+          allTags.add(tag)); } }); allTags.forEach(tag => { %>
           <button
             onclick="filterPosts('<%= tag %>')"
             class="inline-block px-3 py-1 mt-2 mr-2 text-sm font-semibold text-gray-700 bg-gray-200 rounded-full">
@@ -85,12 +85,21 @@
         <% posts.forEach(post => { %>
         <div
           class="p-6 bg-white rounded-lg shadow-lg post"
-          data-tags="<%= Object.keys(post.tags).join(',') %>">
-          <a href="<%= post.url %>" class="block mt-4 text-blue-500 hover:underline"><%= post.src %></a>
-          <span class="text-sm text-gray-700"><%= new Date(post.date).toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'}) %></span>
+          data-tags="<%= post.tags && typeof post.tags === 'object' ? Object.keys(post.tags).join(',') : '' %>">
+          <a
+            href="<%= post.url %>"
+            class="block mt-4 text-blue-500 hover:underline">
+            <%= post.src %>
+          </a>
+          <span class="text-sm text-gray-700">
+            <%= new Date(post.date).toLocaleDateString('de-DE', { year:
+            'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute:
+            'numeric' }) %>
+          </span>
           <h2 class="mb-2 text-2xl font-semibold"><%= post.title %></h2>
-
-          <p class="text-gray-700"><%= post.content.substring(0, 200) %>...</p>
+          <p class="text-gray-700">
+            <%= (post.content || "").substring(0, 200) %>...
+          </p>
           <% if (post.tags && typeof post.tags === 'object') { %> <%
           Object.entries(post.tags).forEach(([tag, keywords]) => { %>
           <span
@@ -99,7 +108,8 @@
           </span>
           <% }); %> <% } %>
         </div>
-      <% }); %>
+        <% }); %>
+      </div>
     </div>
   </body>
 </html>
